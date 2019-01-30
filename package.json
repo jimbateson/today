@@ -8,12 +8,13 @@
   },
   "repository": "https://github.com/jimbateson/todo-app",
   "keywords": [
-	"Electron",
-	"todo"
+    "Electron",
+    "todo"
   ],
   "author": "James Bateson",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^4.0.2"
+    "electron": "^4.0.2",
+    "eslint": "^5.12.1"
   }
 }
