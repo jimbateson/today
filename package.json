@@ -1,0 +1,19 @@
+{
+  "name": "to-do-app",
+  "version": "0.0.1",
+  "description": "A basic todo app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/jimbateson/todo-app",
+  "keywords": [
+	"Electron",
+	"todo"
+  ],
+  "author": "James Bateson",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^4.0.2"
+  }
+}
