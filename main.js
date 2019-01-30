@@ -5,10 +5,26 @@ const {app} = require('electron');
 
 // Get our window class
 const Window = require('./Window');
+// Handle our data
+const DataStore = require('./DataStore');
+
+// create a new todo store name "Todos Main"
+const todosData = new DataStore({
+	name: 'Todos Main'
+});
+
+todosData
+	.addTodo('test todo 1')
+	.addTodo('test todo 2')
+	.addTodo('test todo 3')
+	.deleteTodo('test todo 2');
+
+console.log(todosData.todos);
 
 function main()
 {
 
+	// Set the file to the todo list
 	let mainWindow = new Window({
 		file: 'index.html'
 	});
@@ -16,7 +32,6 @@ function main()
 }
 
 // Create window when ready
-
 app.on('ready', main);
 
 app.on('window-all-closed', () => {
