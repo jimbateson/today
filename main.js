@@ -1,12 +1,13 @@
 'use strict';
 
 // Modules to control application life and create native browser window
-const {app} = require('electron');
+//const path = require('path');
+const { app, ipcMain } = require('electron');
 
 // Get our window class
-const Window = require('./Window');
+const Window = require('./window');
 // Handle our data
-const DataStore = require('./DataStore');
+const DataStore = require('./dataStore');
 
 // create a new todo store name "Todos Main"
 const todosData = new DataStore({
@@ -29,11 +30,65 @@ function main()
 		file: 'index.html'
 	});
 
+	// Add main todo window
+	let addTodoWin;
+
+	mainWindow.once('show', () => {
+
+		mainWindow.webContents.send('todos', todosData.todos);
+
+	});
+
+	// Create our add todo window
+	ipcMain.on('add-todo-window', () => {
+
+		// If the window does not already exist
+		if(!addTodoWin)
+		{
+
+			// Create the window using our window class
+			addTodoWin = new Window({
+				file: 'add.html',
+				height: 400,
+				// Set parent window to main, so it will close if the main one is closd?
+				parent: mainWindow,
+				width: 400
+			});
+
+			addTodoWin.on('closed', () => {
+
+				addTodoWin = null;
+
+			});
+
+		}
+
+	});
+
+	// Add a todo from our add todo window!
+	ipcMain.on('add-todo', (event, todo) => {
+
+		const updatedTodos = todosData.addTodo(todo).todos;
+
+		mainWindow.send('todos', updatedTodos);
+
+	});
+
+	// Delete a todo from our main todos window
+	ipcMain.on('delete-todo', (event, todo) => {
+
+		const updatedTodos = todosData.deleteTodo(todo).todos;
+
+		mainWindow.send('todos', updatedTodos);
+
+	});
+
 }
 
 // Create window when ready
 app.on('ready', main);
 
+// Quit the app when all windows are closed?
 app.on('window-all-closed', () => {
 
 	app.quit();

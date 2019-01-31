@@ -9,7 +9,13 @@
     <!-- All of the Node.js APIs are available in this renderer process. -->
     We are using Node.js <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+	and Electron <script>document.write(process.versions.electron)</script>.
+
+	<!-- Our list of todos, this will be populated by the data -->
+	<ul class="js-todo-list"></ul>
+
+	<!-- The button that will open our add todo window -->
+	<button type="button" class="js-add-todo">Add a Todo</button>
 
     <script>
       // You can also require other files to run in this process
