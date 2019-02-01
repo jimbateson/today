@@ -14,14 +14,6 @@ const todosData = new DataStore({
 	name: 'Todos Main'
 });
 
-todosData
-	.addTodo('test todo 1')
-	.addTodo('test todo 2')
-	.addTodo('test todo 3')
-	.deleteTodo('test todo 2');
-
-console.log(todosData.todos);
-
 function main()
 {
 

@@ -2,24 +2,17 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Todo App</title>
+    <title>Today</title>
   </head>
   <body>
-    <h1>My Todo App</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-	and Electron <script>document.write(process.versions.electron)</script>.
+    <h1>Today</h1>
 
 	<!-- Our list of todos, this will be populated by the data -->
 	<ul class="js-todo-list"></ul>
 
 	<!-- The button that will open our add todo window -->
-	<button type="button" class="js-add-todo">Add a Todo</button>
+	<button type="button" class="js-add-todo">Add a todo</button>
 
-    <script>
-      // You can also require other files to run in this process
-      require('./renderer.js')
-    </script>
+    <script src="./renderer.js"></script>
   </body>
 </html>
