@@ -6,6 +6,7 @@ const { app, ipcMain } = require('electron');
 
 // Get our window class
 const Window = require('./window');
+
 // Handle our data
 const DataStore = require('./dataStore');
 
@@ -14,46 +15,34 @@ const todosData = new DataStore({
 	name: 'Todos Main'
 });
 
+// Our Add todo window
+let mainWindow;
+let addTodoWin;
+
 function main()
 {
 
 	// Set the file to the todo list
-	let mainWindow = new Window({
-		file: 'index.html'
+	mainWindow = new Window({
+		file: 'index.html',
+		showOnLoad: true
 	});
-
-	// Add main todo window
-	let addTodoWin;
 
 	mainWindow.once('show', () => {
 
 		mainWindow.webContents.send('todos', todosData.todos);
+		mainWindow.setMenu(null);
 
 	});
+
+	// If the window does not already exist
+	createToDo();
 
 	// Create our add todo window
 	ipcMain.on('add-todo-window', () => {
 
-		// If the window does not already exist
-		if(!addTodoWin)
-		{
-
-			// Create the window using our window class
-			addTodoWin = new Window({
-				file: 'add.html',
-				height: 400,
-				// Set parent window to main, so it will close if the main one is closd?
-				parent: mainWindow,
-				width: 400
-			});
-
-			addTodoWin.on('closed', () => {
-
-				addTodoWin = null;
-
-			});
-
-		}
+		createToDo();
+		addTodoWin.show();
 
 	});
 
@@ -86,6 +75,32 @@ app.on('window-all-closed', () => {
 	app.quit();
 
 });
+
+function createToDo()
+{
+	if (!addTodoWin) {
+
+		// Create the window using our window class
+		addTodoWin = new Window({
+			file: 'add.html',
+			height: 400,
+			// Set parent window to main, so it will close if the main one is closd?
+			parent: mainWindow,
+			width: 400
+		});
+
+		addTodoWin.setMenu(null);
+
+		addTodoWin.on('closed', () => {
+
+			addTodoWin = null;
+			createToDo();
+
+		});
+
+	}
+
+}
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

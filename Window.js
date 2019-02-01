@@ -19,12 +19,19 @@ class Window extends BrowserWindow {
 		// Load html file and open devtools?
 		// TODO: What does this mean?
 		this.loadFile(file);
-		this.webContents.openDevTools();
+
+		// Remove devtools for now
+		//this.webContents.openDevTools();
 
 		// Prevent flicker when ready to show
-		this.once('ready-to-show', () => {
-			this.show();
-		});
+		if(windowSettings.showOnLoad)
+		{
+
+			this.once('ready-to-show', () => {
+				this.show();
+			});
+
+		}
 
 	}
 }
