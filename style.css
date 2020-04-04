@@ -1,0 +1,144 @@
+:root {
+    --color-dark: #010a20;
+    --color-light: #fff;
+    --color-slate: #262e41;
+    --color-slate-light: #31394c;
+    --color-slate-lightest: #4e5565;
+    --color-secondary: #ff8469;
+    --color-accent: #5881ea;
+    --color-accent-shade: #395fc1;
+    --flow: 20px;
+}
+
+body {
+    background-color: var(--color-dark);
+    font-family: Inter, sans-serif;
+}
+
+h1 {
+    color: var(--color-light);
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-top: 0;
+    text-transform: uppercase;
+}
+
+h1 span {
+    color: var(--color-secondary);
+}
+
+.u-a11y {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+}
+
+.app {
+    background-color: var(--color-slate);
+    border-radius: var(--flow);
+    box-sizing: border-box;
+    margin: 90px auto 40px;
+    max-width: 450px;
+    padding: 40px;
+    position: relative;
+}
+
+.page-bottom {
+    background-color: var(--color-slate-light);
+    border-radius: var(--flow);
+    display: block;
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: -15px;
+    transform: rotate(-3deg);
+    width: 95%;
+    z-index: -1;
+}
+
+.page-top {
+    background-color: var(--color-slate-lightest);
+    border-radius: var(--flow);
+    display: block;
+    height: 50px;
+    left: 0;
+    position: absolute;
+    top: -22px;
+    transform: rotate(-6deg);
+    width: 80%;
+    z-index: -2;
+}
+
+.todo-list {
+    color: var(--color-light);
+    font-size: 1.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.todo-item {
+    align-items: center;
+    display: flex;
+    font-weight: 550;
+    justify-content: space-between;
+}
+
+.todo-item label {
+    align-items: center;
+    display: flex;
+}
+
+.todo-item input {
+	-webkit-appearance: none;
+	background-color: var(--color-slate-lightest);
+    border:0;
+    border-radius: 6px;
+	height: var(--flow);
+	margin: 0 var(--flow) 0 0;
+	outline: 0;
+	overflow: hidden;
+	width: var(--flow);
+}
+
+.todo-delete {
+    cursor: pointer;
+    transition: stroke .3s;
+}
+
+.todo-delete:hover,
+.todo-delete:focus {
+    stroke: #c33;
+}
+
+.todo-item + .todo-item {
+    border-top: 1px solid var(--color-slate-lightest);
+    margin-top: var(--flow);
+    padding-top: var(--flow);
+}
+
+.add-todo {
+    align-items: center;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+    border: 0;
+    cursor: pointer;
+    display: flex;
+    float: right;
+    height: 65px;
+    justify-content: center;
+    margin-bottom: calc(var(--flow) * 2);
+    margin-right: var(--flow);
+    transition: background-color .3s;
+    width: 65px;
+}
+
+.add-todo:hover,
+.add-todo:focus {
+    background-color: var(--color-accent-shade); 
+}

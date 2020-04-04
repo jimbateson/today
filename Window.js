@@ -4,6 +4,8 @@ const { BrowserWindow } = require('electron');
 
 const defaultProps = {
 	height: 800,
+	minHeight: 500,
+	minWidth: 500,
 	show: false,
 	width: 500
 };

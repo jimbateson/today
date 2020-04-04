@@ -1,18 +1,30 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Today</title>
-  </head>
-  <body>
-    <h1>Today</h1>
+	<head>
+		<meta charset="UTF-8">
+		<title>Today</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap" rel="stylesheet"> 
+		<link rel="stylesheet" href="style.css">
+	</head>
 
-	<!-- Our list of todos, this will be populated by the data -->
-	<ul class="js-todo-list"></ul>
+	<body>
+		<div class="app">
+			<!-- TODO: I'd prefer to do this with pseudo, but z-index issues! -->
+			<span class="page-top"></span>
+			<span class="page-bottom"></span>
 
-	<!-- The button that will open our add todo window -->
-	<button type="button" class="js-add-todo">Add a todo</button>
+			<h1><span>//</span> Today</h1>
 
-    <script src="./renderer.js"></script>
-  </body>
+			<!-- Our list of todos, this will be populated by the data -->
+			<ul class="todo-list js-todo-list"></ul>
+		</div>
+
+		<!-- The button that will open our add todo window -->
+		<button type="button" class="add-todo js-add-todo">
+			<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+			<span class="u-a11y">Add a todo</span>
+		</button>
+
+		<script src="./renderer.js"></script>
+	</body>
 </html>

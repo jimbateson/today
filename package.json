@@ -14,8 +14,8 @@
   "author": "James Bateson",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^4.0.2",
+    "electron": "^4.2.12",
     "electron-store": "^2.0.0",
-    "eslint": "^5.12.1"
+    "eslint": "^5.16.0"
   }
 }
