@@ -106,6 +106,23 @@ h1 span {
 	width: var(--flow);
 }
 
+.todo-item input:before {
+    background-image: url(tick.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 18px;
+    content: '';
+    display: block;
+    height: 20px;
+    opacity: 0;
+    transition: opacity .3s;
+    width: 20px;
+}
+
+.todo-item input:checked:before {
+    opacity: 1;
+}
+
 .todo-delete {
     cursor: pointer;
     transition: stroke .3s;
