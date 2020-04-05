@@ -83,6 +83,7 @@ function createToDo()
 		// Create the window using our window class
 		addTodoWin = new Window({
 			file: 'add.html',
+			//frame: false,
 			height: 400,
 			// Set parent window to main, so it will close if the main one is closd?
 			parent: mainWindow,

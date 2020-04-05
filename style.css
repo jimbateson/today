@@ -89,6 +89,26 @@ h1 span {
     justify-content: space-between;
 }
 
+.todo-item span {
+    position: relative;
+}
+
+.todo-item span:before {
+    background-color: var(--color-light);
+    content: '';
+    display: block;
+    height: 2px;
+    position: absolute;
+    top: 51%;
+    transform: translateY(-50%);
+    transition: width .3s;
+    width: 0;
+}
+
+.todo-item.todo-complete span:before {
+    width: 100%;
+}
+
 .todo-item label {
     align-items: center;
     display: flex;

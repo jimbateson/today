@@ -1,30 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Add a Todo</title>
-  </head>
-  <body>
-    <h1>Add a new todo</h1>
+	<head>
+		<meta charset="UTF-8">
+		<title>Today | Add a Todo</title>
 
-	<!-- The input for our new todo (it's cleared via JS once the todo has been added) -->
-	<form class="js-add-todo-form">
-		<div>
-			<label for="new_todo">New todo</label>
-			<input type="text" id="new_todo" required>
+		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="add.css">
+	</head>
+
+	<body>
+		<div class="app">
+			<h1><span>+</span> Add a todo</h1>
+
+			<!-- The input for our new todo (it's cleared via JS once the todo has been added) -->
+			<form class="js-add-todo-form">
+				<div>
+					<label for="new_todo">New todo</label>
+					<input type="text" id="new_todo" placeholder="Today I want to..." required>
+				</div>
+
+				<!-- <div>
+					<label for="todo_description">Todo description</label>
+					<textarea id="todo_description" rows="10"></textarea>
+				</div> -->
+
+				<div>
+					<!-- Send the new todo to the main process, to add to our opther todos -->
+					<button>Add todo</button>
+				</div>
+			</form>
 		</div>
 
-		<div>
-			<label for="todo_description">Todo description</label>
-			<textarea id="todo_description" rows="10"></textarea>
-		</div>
-
-		<div>
-			<!-- Send the new todo to the main process, to add to our opther todos -->
-			<button>Add todo</button>
-		</div>
-	</form>
-
-    <script src="./add.js"></script>
-  </body>
+		<script src="./add.js"></script>
+	</body>
 </html>
