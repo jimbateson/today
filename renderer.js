@@ -4,6 +4,8 @@
 
 'use strict';
 
+const DataStore = require('./Datastore.js');
+
 const { ipcRenderer } = require('electron');
 
 // Delete Todo by getting text (to match against data)
@@ -28,9 +30,9 @@ ipcRenderer.on('todos', (event, todos) => {
 	const todoList = document.querySelector('.js-todo-list');
 
 	// Create the html
-	const todoItems = todos.reduce((html, todo) => {
+	const todoItems = todos.reduce((html, todo, idx) => {
 
-		html+= `<li class="todo-item js-todo-item">
+		html+= `<li class="todo-item js-todo-item" data-index="${idx}">
 					<label>
 						<input type="checkbox" class="js-complete-todo">
 						<span>${todo.name}</span>
@@ -53,25 +55,16 @@ ipcRenderer.on('todos', (event, todos) => {
 		item.querySelector('.js-delete-todo').addEventListener('click', deleteTodo);
 
 		// Completed
-		item.querySelector('.js-complete-todo').addEventListener('change', e => {
+		item.querySelector('.js-complete-todo').addEventListener('change', (e, updateTodos) => {
 			// console.log(todos.indexOf(e.target.parentElement.getElementsByTagName('span')[0].textContent));
 			item.classList.toggle('todo-complete');
 
-			console.log(todos);
-
-			// 0, 1, 2 etc
-			let pos = todos.map(e => {
-				return e.name;
-			}).indexOf(item.querySelector('.js-complete-todo').parentElement.getElementsByTagName('span')[0].textContent);
-
-			console.log(pos);
-
-			pos = {
-				completed: true,
-				name: e.target.parentElement.getElementsByTagName('span')[0].textContent
+			todos[item.dataset.index] = {
+				name: e.target.parentElement.getElementsByTagName('span')[0].textContent,
+				completed: true
 			}
 
-			console.log(pos);
+			DataStore.updateTodos(todos);
 		});
 
 	});

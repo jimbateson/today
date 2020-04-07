@@ -21,6 +21,15 @@ class DataStore extends Store {
 
 	}
 
+	updateTodos(todos)
+	{
+
+		this.set('todos', todos);
+
+		return this;
+
+	}
+
 	getTodos()
 	{
 
