@@ -5,6 +5,7 @@
 'use strict';
 
 const DataStore = require('./Datastore.js');
+const clsDataStore = new DataStore();
 
 const { ipcRenderer } = require('electron');
 
@@ -55,7 +56,7 @@ ipcRenderer.on('todos', (event, todos) => {
 		item.querySelector('.js-delete-todo').addEventListener('click', deleteTodo);
 
 		// Completed
-		item.querySelector('.js-complete-todo').addEventListener('change', (e, updateTodos) => {
+		item.querySelector('.js-complete-todo').addEventListener('change', e => {
 			// console.log(todos.indexOf(e.target.parentElement.getElementsByTagName('span')[0].textContent));
 			item.classList.toggle('todo-complete');
 
@@ -64,7 +65,10 @@ ipcRenderer.on('todos', (event, todos) => {
 				completed: true
 			}
 
-			DataStore.updateTodos(todos);
+			clsDataStore.updateTodos(todos);
+			ipcRenderer.send('update-todos');
+
+			console.log(todos);
 		});
 
 	});

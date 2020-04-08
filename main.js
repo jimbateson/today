@@ -46,6 +46,14 @@ function main()
 
 	});
 
+	ipcMain.on('update-todos', (event, todos) => {
+
+		const updatedTodos = todosData.updateTodos(todos).todos;
+
+		mainWindow.send('todos', updatedTodos);
+
+	});
+
 	// Add a todo from our add todo window!
 	ipcMain.on('add-todo', (event, todo) => {
 
