@@ -2,29 +2,47 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Today</title>
+		<title>//Today:</title>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap" rel="stylesheet"> 
 		<link rel="stylesheet" href="style.css">
 	</head>
 
 	<body>
-		<div class="app">
-			<!-- TODO: I'd prefer to do this with pseudo, but z-index issues! -->
-			<span class="page-top"></span>
-			<span class="page-bottom"></span>
+		<div class="app js-todo-app">
+			<div class="wrapper">
+				<!-- TODO: I'd prefer to do this with pseudo, but z-index issues! -->
+				<span class="page-top"></span>
+				<span class="page-bottom"></span>
 
-			<h1><span>//</span> Today</h1>
+				<h1><span>//</span> Today:</h1>
 
-			<!-- Our list of todos, this will be populated by the data -->
-			<ul class="todo-list js-todo-list"></ul>
+				<ul v-if="todos.length" class="todo-list js-todo-list">
+					<li class="todo-item js-todo-item" v-for="(todo, index) in todos" :key="index" :class="{ 'todo-complete' : todo.completed }" :data-index="index">
+						<label>
+							<input type="checkbox" class="js-complete-todo" v-model="todo.completed" @change="updateTodos">
+							<span>{{ todo.title }}</span>
+						</label>
+						
+						<button @click="deleteTodo(index)" class="todo-delete js-delete-todo"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+					</li>
+				</ul>
+				
+				<p v-else>Hello, productive! Add a todo to get started.</p>
+			</div>
+
+			<div class="add-todo-wrapper">
+				<label for="add_todo">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff8469" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+					Add a new todo
+				</label>
+				<div class="add-todo-wrapper__controls">
+					<input type="text" id="add_todo" v-model="newTodo" @keyup.enter="addTodo" name="add_todo" placeholder="Today I want to..." required>
+					<button class="add-todo-wrapper__button" @click="addTodo">Add todo</button>
+				</div>
+			</div>
 		</div>
 
-		<!-- The button that will open our add todo window -->
-		<button type="button" class="add-todo js-add-todo">
-			<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-			<span class="u-a11y">Add a todo</span>
-		</button>
-
-		<script src="./renderer.js" type="module"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src="./app.js" type="module"></script>
 	</body>
 </html>
