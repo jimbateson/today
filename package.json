@@ -1,7 +1,7 @@
 {
   "name": "today",
   "productName": "Today",
-  "version": "0.9.0",
+  "version": "0.0.1",
   "description": "A basic todo app built with Electron and Vue",
   "main": "main.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "repository": "https://github.com/jimbateson/todo-app",
+  "repository": "https://github.com/jimbateson/today",
+  "issues": "https://github.com/jimbateson/today/issues",
   "keywords": [
     "Electron",
     "todo",
@@ -28,12 +29,12 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.52",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.52",
     "@electron-forge/maker-zip": "^6.0.0-beta.52",
-    "electron": "^9.1.0",
+    "electron": "^8.2.4",
     "eslint": "^5.16.0"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
-    "electron-store": "^5.2.0"
+    "electron-store": "^5.1.1"
   },
   "config": {
     "forge": {
