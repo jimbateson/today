@@ -4,7 +4,7 @@ const store = new Store();
 // Handle our data
 const DataStore = require('./dataStore');
 
-// create a new todo store name "Todos Main"
+// Create a new todo store name "Todos Main"
 const todosData = new DataStore({
 	name: 'Todos Main'
 });
@@ -27,7 +27,6 @@ class Todos {
 			data() { 
 				return {
 					newTodo: '',
-					// Initial todos, will need to replace with JSON file?
 					todos: store.get('todos')
 				}
 			},
@@ -51,7 +50,6 @@ class Todos {
 					}
 				},
 				deleteTodo(index) {
-					// The bind on the todo should mean the index gets updated
 					this.$delete(this.todos, index);
 					this.updateTodos();
 				},
