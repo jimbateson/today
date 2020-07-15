@@ -1,170 +1,425 @@
 #!/usr/bin/env node
 
-const childProcess = require('child_process');
+/**
+ * Creates the release for a new version of OptimusTime by making sure all of the right files
+ * are in the right place, creating a new draft release on GitHub, uploading all of the assets
+ * and then notifying Slack of the new release
+ *
+ * @module release
+ * @author Alex Hall
+ * @category App
+ */
+
+'use strict';
+
+// If this errors try running the following first:
+// git config --local http.postBuffer 157286400
+
+// var childProcess = require('child_process');
+const logSymbols = require('log-symbols');
 const fs = require('fs');
 const path = require('path');
-const { Octokit } = require('@octokit/rest');
-const dotenv = require('dotenv');
-dotenv.config();
+const request = require('request');
+const util = require('util');
+const AdmZip = require('adm-zip');
+const { exec } = require('child_process');
+const blnDebug = /--debug/.test(process.argv[2]);
 
 const token = process.env.GITHUB_TOKEN;
 const objPackage = require('./package.json');
-const version = objPackage.version;
-const github = new Octokit({
-  userAgent: `node/${process.versions.node}`,
-  request: {
-    timeout: 30 * 1000,
-  }
-});
 
-if (!token) {
-  console.error('GITHUB_TOKEN environment variable not set\nSet it to a token with repo scope created from https://github.com/settings/tokens/new')
-  process.exit(1)
-};
+// Paths
+const strWinOut = path.join(__dirname, 'out', 'make', 'squirrel.windows', 'x64');
+const strMacOut = path.join(__dirname, 'out', 'make');
 
-github.authenticate = new Object({
-  type: 'token',
-  token: token
-});
+// The release description as markdown
+let strRelease = ``;
 
-async function doRelease () {
-  const release = await getOrCreateRelease();
-  const assets = await prepareAssets();
-  await uploadAssets(release, assets);
-  await publishRelease(release);
-  console.log('Done!');
-};
+// Let's give this release a name
+let strName = `Today v${objPackage.version}`;
 
-doRelease().catch(err => {
-  console.error(err.message || err);
-  process.exit(1);
-});
+if(blnDebug)
+{
 
-function prepareAssets () {
-  const outPath = path.join(__dirname, 'out');
+	getRelease().then(() => {
 
-  const zipAssets = [{
-    name: 'today-mac.zip',
-    path: path.join(outPath, 'Today-darwin-x64', 'Today.app')
-  }, {
-    name: 'today-windows.zip',
-    path: path.join(outPath, 'Today-win32-ia32')
-  }, {
-    name: 'today-linux.zip',
-    path: path.join(outPath, 'Today-linux-x64')
-  }]
+		console.log(strRelease);
 
-  return Promise.all(zipAssets.map(zipAsset)).then((zipAssets) => {
-    return zipAssets.concat([{
-      name: 'RELEASES',
-      path: path.join(outPath, 'windows-installer', 'RELEASES')
-    }, {
-      name: 'TodaySetup.exe',
-      path: path.join(outPath, 'windows-installer', 'TodaySetup.exe')
-    }, {
-      name: `today-${version}-full.nupkg`,
-      path: path.join(outPath, 'windows-installer', `today-${version}-full.nupkg`)
-    }])
-  })
+	});
+	return;
+
 }
 
-function zipAsset (asset) {
-  return new Promise((resolve, reject) => {
-    const assetBase = path.basename(asset.path)
-    const assetDirectory = path.dirname(asset.path)
-    console.log(`Zipping ${assetBase} to ${asset.name}`)
+checkToken()
+	.then(getRelease)
+	.then(zipAssets)
+	// Create private release
+	.then(createRelease)
+	.then(uploadAssets)
+	.then(publishRelease)
+	.catch(error => {
 
-    if (!fs.existsSync(asset.path)) {
-      return reject(new Error(`${asset.path} does not exist`))
-    }
+		console.log(logSymbols.error, (error.message || error) + '\n');
+		process.exit(1);
 
-    const zipCommand = `zip --recurse-paths --symlinks '${asset.name}' '${assetBase}'`
-    const options = {cwd: assetDirectory, maxBuffer: Infinity}
-    childProcess.exec(zipCommand, options, (error) => {
-      if (error) {
-        reject(error)
-      } else {
-        asset.path = path.join(assetDirectory, asset.name)
-        resolve(asset)
-      }
-    })
-  })
+	});
+
+/**
+ * Check for a GitHub repo-accessible token
+ */
+function checkToken()
+{
+
+	if(!token)
+	{
+
+		return Promise.reject('Token environment variable not set\nSet it to a token with repo scope created from https://github.com/settings/tokens/new');
+
+	} else {
+
+		return Promise.resolve(token);
+
+	}
+
 }
 
-async function getOrCreateRelease () {
-  const { data: releases } = await github.repos.listReleases({
-    owner: 'jimbateson',
-    repo: 'today',
-    per_page: 100,
-    page: 1
-  })
-  const existingRelease = releases.find(release => release.tag_name === `v${version}` && release.draft === true)
-  if (existingRelease) {
-    console.log(`Using existing draft release for v${version}`)
-    return existingRelease
-  }
+/**
+ * Get release information from commits to the repo since
+ * the last tag/release
+ *
+ * @see https://blogs.sap.com/2018/06/22/generating-release-notes-from-git-commit-messages-using-basic-shell-commands-gitgrep/
+ * @return {Promise}
+ */
+function getRelease()
+{
 
-  console.log('Creating new draft release')
-  const { data: release } = await github.repos.createRelease({
-    owner: 'jimbateson',
-    repo: 'today',
-    tag_name: `v${version}`,
-    target_commitish: 'develop',
-    name: version,
-    body: 'An awesome new release :tada:',
-    draft: true,
-    prerelease: false
-  })
-  return release
+	return new Promise((resolve, reject) => {
+
+		fs.readFile(path.join(__dirname, 'release.txt'), 'utf8', (err, strData) => {
+
+			if(err)
+			{
+
+				reject(err);
+
+			}
+			strRelease = strData;
+			resolve();
+
+		});
+
+	});
+
 }
 
-async function uploadAssets (release, assets) {
-  for (const asset of assets) {
-    if (release.assets.some(ghAsset => ghAsset.name === asset.name)) {
-      console.log(`Skipping already uploaded asset ${asset.name}`)
-    } else {
-      process.stdout.write(`Uploading ${asset.name}... `)
-      try {
-        await uploadAsset(release, asset)
-      } catch (err) {
-        if (err.name === 'HttpError' && err.message.startsWith('network timeout')) {
-          console.error('\n')
-          console.error(`  There was a network timeout while uploading ${asset.name}.`)
-          console.error('  This likely resulted in a bad asset; please visit the release at')
-          console.error(`  ${release.html_url} and manually remove the bad asset,`)
-          console.error(`  then run this script again to continue where you left off.`)
-          console.error('')
-          process.exit(2)
-        } else {
-          throw err
-        }
-      }
+/**
+ * Zip up the the passed asset to offer a smaller filesize
+ *
+ * @param {Object} asset The asset to zip up
+ * @return {Promise}
+ */
+function zipAsset(asset)
+{
 
-      process.stdout.write('Success!\n')
-      // [mkt] Waiting a bit between uploads seems to increase success rate
-      await new Promise(resolve => setTimeout(resolve, 5000))
-    }
-  }
+	return new Promise((resolve, reject) => {
+
+		const assetBase = path.basename(asset.path);
+		const assetPath = path.join(strWinOut, asset.name);
+
+		console.log(logSymbols.info, 'Zipping ' + assetBase + ' to ' + asset.name + ' (this may take a while)');
+
+		if(!fs.existsSync(asset.path))
+		{
+
+			return reject(new Error(asset.path + ' does not exist'));
+
+		}
+
+		// Create a new Zip Archive
+		const zip = new AdmZip();
+
+		// add local file
+		zip.addLocalFile(asset.path);
+		// or write everything to disk
+		zip.writeZip(assetPath);
+
+		// Set asset path to the new zip file
+		asset.path = assetPath;
+		resolve(asset);
+
+	});
 }
 
-function uploadAsset (release, asset) {
-  return github.repos.uploadReleaseAsset({
-    headers: {
-      'content-type': 'application/octet-stream',
-      'content-length': fs.statSync(asset.path).size
-    },
-    url: release.upload_url,
-    file: fs.createReadStream(asset.path),
-    name: asset.name
-  })
+/**
+ * Zip all required assets
+ * @return {Promise}
+ */
+function zipAssets()
+{
+
+	// This is the only one we actually want to zip up
+	let arrAssets = [{
+		name: objPackage.productName + '-' + objPackage.version + '-Windows.zip',
+		path: path.join(strWinOut, objPackage.productName + '-' + objPackage.version + '-Setup.exe')
+	}];
+
+	console.log(logSymbols.info, 'Zipping setup file.');
+
+	// Zip the asset above and then return an array with all of the other assets
+	return Promise.all(arrAssets.map(zipAsset)).then(arrAssets => {
+
+		// Let me know
+		console.log(logSymbols.success, 'The ZIP file was created successfully.');
+
+		return arrAssets.concat([
+			{
+				name: 'RELEASES',
+				path: path.join(strWinOut, 'RELEASES')
+			},
+			{
+				name: objPackage.productName + '-' + objPackage.version + '-Setup.exe',
+				path: path.join(strWinOut, objPackage.productName + '-' + objPackage.version + '-Setup.exe')
+			},
+			{
+				name: objPackage.productName + 'Setup.msi',
+				path: path.join(strWinOut, objPackage.productName + 'Setup.msi')
+			},
+			/*{
+				name: objPackage.productName + '-' + objPackage.version.replace('beta.', 'beta') + '-delta.nupkg',
+				path: path.join(strWinOut,objPackage.productName + '-' + objPackage.version.replace('beta.', 'beta') + '-delta.nupkg')
+			},*/
+			{
+				name: objPackage.productName + '-' + objPackage.version.replace('beta.', 'beta') + '-full.nupkg',
+				path: path.join(strWinOut, objPackage.productName + '-' + objPackage.version.replace('beta.', 'beta') + '-full.nupkg')
+			},
+			{
+				name: objPackage.productName + '-darwin-x64-' + objPackage.version + '.zip',
+				path: path.join(strMacOut, 'zip', 'darwin', 'x64', objPackage.productName + '-darwin-x64-' + objPackage.version + '.zip')
+			},
+			{
+				name: objPackage.productName + '-' + objPackage.version + '.dmg',
+				path: path.join(strMacOut, objPackage.productName + '-' + objPackage.version + '.dmg')
+			}
+		]);
+	});
+
 }
 
-function publishRelease (release) {
-  console.log('Publishing release')
-  return github.repos.updateRelease({
-    owner: 'jimbateson',
-    repo: 'today',
-    release_id: release.id,
-    draft: false
-  })
+/**
+ * Create a new release on GitHub releases
+ *
+ * @param  {Array} assets The assets to add to the release
+ * @return {Promise}
+ */
+function createRelease(assets)
+{
+
+	const options = {
+		uri: 'https://api.github.com/repos/jimbateson/today/releases',
+		headers: {
+			Authorization: 'token ' + token,
+			'User-Agent': 'node/' + process.versions.node
+		},
+		json: {
+			tag_name: 'v' + objPackage.version,
+			target_commitish: 'develop',
+			name: objPackage.version,
+			body: strRelease,
+			draft: true,
+			prerelease: true
+		}
+	};
+
+	return new Promise((resolve, reject) => {
+
+		console.log(logSymbols.info, 'Creating new draft release');
+
+		request.post(options, (error, response, body) => {
+
+			if (error) {
+				return reject(Error('Request failed: ' + (error.message || error)));
+			}
+
+			if (response.statusCode !== 201) {
+				return reject(Error('Non-201 response: ' + response.statusCode + '\n' + util.inspect(body)));
+			}
+
+			console.log(logSymbols.success, 'Draft release created successfully.');
+
+			resolve({assets: assets, draft: body});
+
+		});
+
+	});
+
+}
+
+/**
+ * Upload our assets to the created GitHub release
+ *
+ * @param {Object} release The release to upload to (from createRelease)
+ * @param {Object} asset   The asset to upload
+ * @return {Promise}
+ */
+function uploadAsset(release, asset)
+{
+
+	const options = {
+		uri: release.upload_url.replace(/\{.*$/, '?name=' + asset.name),
+		headers: {
+			Authorization: 'token ' + token,
+			'Content-Type': 'application/zip',
+			'Content-Length': fs.statSync(asset.path).size,
+			'User-Agent': 'node/' + process.versions.node
+		}
+	};
+
+	return new Promise((resolve, reject) => {
+
+		console.log('• Uploading ' + asset.name + ' as release asset');
+
+		const assetRequest = request.post(options, (error, response, body) => {
+
+			if (error) {
+				return reject(Error('Uploading asset failed: ' + (error.message || error)));
+			}
+
+			if (response.statusCode >= 400) {
+				return reject(Error('400+ response: ' + response.statusCode + '\n' + util.inspect(body)));
+			}
+
+			console.log(logSymbols.success, 'Uploaded ' + asset.name + ' successfully');
+			resolve(release);
+
+		});
+
+		fs.createReadStream(asset.path).pipe(assetRequest);
+
+	});
+
+}
+
+/**
+ * Upload all assets for this release
+ *
+ * @param  {Object} release The release
+ * @return {Promise}
+ */
+function uploadAssets(release)
+{
+
+	console.log(logSymbols.info, 'Uploading release assets.');
+	console.group();
+	return Promise.all(release.assets.map(asset => uploadAsset(release.draft, asset))).then(() => {
+
+		// Let me know
+		console.groupEnd();
+		console.log(logSymbols.success, 'All assets uploaded successfully.\n');
+		return release;
+
+	});
+
+}
+
+/**
+ * Update the drafted release and set it to publish
+ *
+ * @param  {Object} release The release
+ * @return {Promise}
+ */
+function publishRelease(release)
+{
+
+	const options = {
+		uri: release.draft.url,
+		headers: {
+		Authorization: 'token ' + token,
+			'User-Agent': 'node/' + process.versions.node
+		},
+		json: {
+			draft: false,
+			prerelease: objPackage.version.indexOf('beta') !== -1
+		}
+	};
+
+	return new Promise((resolve, reject) => {
+
+		console.log(logSymbols.info, 'Publishing release');
+
+		request.post(options, (error, response, body) => {
+
+			if(error)
+			{
+				return reject(Error('Request failed: ' + (error.message || error)));
+			}
+
+			if (response.statusCode !== 200)
+			{
+				return reject(Error('Non-200 response: ' + response.statusCode + '\n' + util.inspect(body)));
+			}
+
+			console.log(logSymbols.success, 'Package version ' + objPackage.version + ' released successfully!\n');
+
+			const arrAssets = [
+				{
+					name: 'RELEASES',
+					path: path.join(strWinOut, 'RELEASES')
+				},
+				{
+					name: objPackage.productName + '-' + objPackage.version + '-Setup.exe',
+					path: path.join(strWinOut, objPackage.productName + '-' + objPackage.version + '-Setup.exe')
+				},
+				{
+					name: objPackage.productName + 'Setup.msi',
+					path: path.join(strWinOut, objPackage.productName + 'Setup.msi')
+				},
+				/*{
+					name: objPackage.productName + '-' + objPackage.version.replace('beta.', 'beta') + '-delta.nupkg',
+					path: path.join(strWinOut,objPackage.productName + '-' + objPackage.version.replace('beta.', 'beta') + '-delta.nupkg')
+				},*/
+				{
+					name: objPackage.productName + '-' + objPackage.version.replace('beta.', 'beta') + '-full.nupkg',
+					path: path.join(strWinOut, objPackage.productName + '-' + objPackage.version.replace('beta.', 'beta') + '-full.nupkg')
+				},
+				{
+					name: objPackage.productName + '-darwin-x64-' + objPackage.version + '.zip',
+					path: path.join(strMacOut, 'zip', 'darwin', 'x64', objPackage.productName + '-darwin-x64-' + objPackage.version + '.zip')
+				},
+				{
+					name: objPackage.productName + '-' + objPackage.version + '.dmg',
+					path: path.join(strMacOut, objPackage.productName + '-' + objPackage.version + '.dmg')
+				}
+			];
+
+			resolve(arrAssets);
+
+		});
+
+	});
+
+}
+
+/**
+ * Update package.json by bumping the version number
+ *
+ * @return {Promise}
+ */
+function updatePackage(strType)
+{
+
+	return new Promise((resolve, reject) => {
+
+		console.log(logSymbols.info, 'Bumping package version.');
+		exec(`npm version ${strType} -m "🔖 Release v%s"`, { cwd : path.join(__dirname) }, (err, stdout, stderr) => {
+
+			if(err){ reject(err); }
+			if(stderr){ reject(stderr); }
+			console.log(logSymbols.success, 'Bumped package.json version to ' + stdout + '\n');
+			console.log(logSymbols.success, 'New version released successfully!');
+			resolve();
+
+		});
+
+	});
+
 }
