@@ -12,12 +12,6 @@ const objPackage = require('./package.json');
 const version = objPackage.version;
 const github = new Octokit({
   userAgent: `node/${process.versions.node}`,
-  log: {
-    debug: () => {},
-    info: () => {},
-    warn: console.warn,
-    error: console.error
-  },
   request: {
     timeout: 30 * 1000,
   }
@@ -47,7 +41,7 @@ doRelease().catch(err => {
 });
 
 function prepareAssets () {
-  const outPath = path.join(__dirname, '..', 'out');
+  const outPath = path.join(__dirname, 'out');
 
   const zipAssets = [{
     name: 'today-mac.zip',
