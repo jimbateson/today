@@ -1,7 +1,7 @@
 {
   "name": "today",
   "productName": "Today",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "description": "A basic todo app built with Electron and Vue",
   "main": "main.js",
   "scripts": {
@@ -65,7 +65,7 @@
             "name": "Today",
             "noMsi": false,
             "setupIcon": "./icons/today-icon.ico",
-            "setupExe": "Today-0.0.2-Setup.exe"
+            "setupExe": "Today-0.0.1-Setup.exe"
           }
         },
         {
