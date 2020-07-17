@@ -1,34 +1,29 @@
 const Store = require('electron-store');
-const store = new Store();
-
-// Handle our data
-const DataStore = require('./dataStore');
-
-// create a new todo store name "Todos Main"
-const todosData = new DataStore({
-	name: 'Todos Main'
-});
+const dataStore = new Store(
+	{
+		name: 'today-today'
+	}
+);
 
 class Todos {
 	constructor(settings) {
 		// Init with our todos or an empty array
-		this.arrTodos = store.get('todos') || [];
+		this.arrTodos = dataStore.get('todos') || [];
 	}
 
 	init() {
 		this.startApp();
 	}
 
-	startApp() {
-		const self = this;
+	startApp()
+	{
 
 		new Vue({
 			el: '.js-todo-app',
 			data() { 
 				return {
 					newTodo: '',
-					// Initial todos, will need to replace with JSON file?
-					todos: store.get('todos')
+					todos: dataStore.get('todos') || []
 				}
 			},
 			mounted() {
@@ -51,15 +46,15 @@ class Todos {
 					}
 				},
 				deleteTodo(index) {
-					// The bind on the todo should mean the index gets updated
 					this.$delete(this.todos, index);
 					this.updateTodos();
 				},
 				updateTodos() {
-					store.set('todos', this.todos);
+					dataStore.set('todos', this.todos);
 				}
 			}
 		});
+
 	}
 }
 

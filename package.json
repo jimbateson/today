@@ -1,22 +1,113 @@
 {
   "name": "today",
-  "version": "0.9.0",
+  "productName": "Today",
+  "version": "0.0.1",
   "description": "A basic todo app built with Electron and Vue",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "test": "node ./release.js",
+    "release": "npm run make && npm run test"
   },
-  "repository": "https://github.com/jimbateson/todo-app",
+  "repository": "https://github.com/jimbateson/today",
+  "issues": "https://github.com/jimbateson/today/issues",
   "keywords": [
     "Electron",
     "todo",
-    "today"
+    "todos",
+    "Today",
+    "Vue",
+    "productivity",
+    "starter project",
+    "learning"
   ],
   "author": "James Bateson",
   "license": "MIT",
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.52",
+    "@electron-forge/maker-deb": "^6.0.0-beta.52",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.52",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.52",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.52",
+    "@electron-forge/maker-zip": "^6.0.0-beta.52",
+    "@electron-forge/publisher-github": "^6.0.0-beta.52",
+    "@octokit/rest": "^18.0.0",
+    "adm-zip": "^0.4.16",
+    "dotenv": "^8.2.0",
     "electron": "^8.2.4",
-    "electron-store": "^5.1.1",
-    "eslint": "^5.16.0"
+    "eslint": "^5.16.0",
+    "log-symbols": "^4.0.0"
+  },
+  "dependencies": {
+    "@sentry/electron": "^1.4.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^5.1.1"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "appCategoryType": "public.app-category.productivity",
+        "icon": "icons/today-icon",
+        "ignore": [
+          "^/.github",
+          "^/.gitignore",
+          "^/package-lock.json",
+          "^/README.md",
+          "^/release.txt"
+        ]
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "Today",
+            "noMsi": false,
+            "setupIcon": "./icons/today-icon.ico",
+            "setupExe": "Today-Setup.exe"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "format": "ULFO",
+            "icon": "./icons/today-icon.icns",
+            "additionalDMGOptions": {
+              "background-color": "#262e41",
+              "window": {
+                "size": {
+                  "height": 498,
+                  "width": 658
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ],
+      "publishers": [
+        {
+          "name": "@electron-forge/publisher-github",
+          "config": {
+            "repository": {
+              "owner": "jimbateson",
+              "name": "today"
+            },
+            "draft": true,
+            "prerelease": false
+          }
+        }
+      ]
+    }
   }
 }

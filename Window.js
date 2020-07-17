@@ -1,4 +1,5 @@
 const { BrowserWindow } = require('electron');
+const path = require('path');
 
 // The default window settings
 
@@ -8,6 +9,7 @@ const defaultProps = {
 	minWidth: 500,
 	show: false,
 	width: 500,
+	icon: path.join(__dirname, 'icons/today-icon.png'),
 	webPreferences: { nodeIntegration: true }
 };
 
