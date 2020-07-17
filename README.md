@@ -1,6 +1,6 @@
 ![Today icon](https://github.com/jimbateson/today/blob/master/icons/today-icon.png)
 
-# // Today:
+# // Today
 
 A very simple todo app built with Electron and Vue.js
 
@@ -13,7 +13,7 @@ Today can currently:
 
 I've got a few features planned for the future and I am still getting my head around Electron and Vue so hope to grow this app into something really useful over time. To name a few early features planned:
 
-- Option desciption for a todo
+- Optional desciption for a todo
 - Date the todo was created
 - Sort todos
 - Warnings etc for stale todos
