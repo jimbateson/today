@@ -23,7 +23,7 @@ I've got a few features planned for the future and I am still getting my head ar
 
 ### Tutorial
 
-[This awesome tutorial](https://codeburst.io/build-a-todo-app-with-electron-d6c61f58b55a)on which this app is based and the [base Electron boilerplate](https://github.com/electron/electron-quick-start).
+[This awesome tutorial](https://codeburst.io/build-a-todo-app-with-electron-d6c61f58b55a) on which this app is based and the [base Electron boilerplate](https://github.com/electron/electron-quick-start).
 
 ### Alex Hall
 
@@ -31,6 +31,6 @@ For letting me use his cool GitHub release packaging script and helping me with 
 
 ## Resources
 
-[https://jamesbateson.co.uk/articles/building-a-simple-todo-app-with-vue-js/](I wrote an article) on setting up a basic todo list with Vue.js
+[I wrote an article](https://jamesbateson.co.uk/articles/building-a-simple-todo-app-with-vue-js/) on setting up a basic todo list with Vue.js
 
 I'll be putting together a more in-depth article including how I went about intergrating Electron with Vue and then publishing my first release.
