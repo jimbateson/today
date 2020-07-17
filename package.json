@@ -28,9 +28,11 @@
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.52",
     "@electron-forge/maker-deb": "^6.0.0-beta.52",
+    "@electron-forge/maker-dmg": "^6.0.0-beta.52",
     "@electron-forge/maker-rpm": "^6.0.0-beta.52",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.52",
     "@electron-forge/maker-zip": "^6.0.0-beta.52",
+    "@electron-forge/publisher-github": "^6.0.0-beta.52",
     "@octokit/rest": "^18.0.0",
     "adm-zip": "^0.4.16",
     "dotenv": "^8.2.0",
@@ -39,6 +41,7 @@
     "log-symbols": "^4.0.0"
   },
   "dependencies": {
+    "@sentry/electron": "^1.4.0",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^5.1.1"
   },
@@ -46,13 +49,23 @@
     "forge": {
       "packagerConfig": {
         "appCategoryType": "public.app-category.productivity",
-        "icon": "icons/today-icon"
+        "icon": "icons/today-icon",
+        "ignore": [
+          "^/.github",
+          "^/.gitignore",
+          "^/package-lock.json",
+          "^/README.md",
+          "^/release.txt"
+        ]
       },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Today"
+            "name": "Today",
+            "noMsi": false,
+            "setupIcon": "./icons/today-icon.ico",
+            "setupExe": "Today-Setup.exe"
           }
         },
         {
@@ -62,12 +75,37 @@
           ]
         },
         {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "format": "ULFO",
+            "icon": "./icons/today-icon.icns",
+            "additionalDMGOptions": {
+              "background-color": "#262e41",
+              "window": {
+                "size": {
+                  "height": 498,
+                  "width": 658
+                }
+              }
+            }
+          }
         },
         {
           "name": "@electron-forge/maker-rpm",
           "config": {}
+        }
+      ],
+      "publishers": [
+        {
+          "name": "@electron-forge/publisher-github",
+          "config": {
+            "repository": {
+              "owner": "jimbateson",
+              "name": "today"
+            },
+            "draft": true,
+            "prerelease": false
+          }
         }
       ]
     }

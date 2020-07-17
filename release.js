@@ -24,6 +24,8 @@ const util = require('util');
 const AdmZip = require('adm-zip');
 const { exec } = require('child_process');
 const blnDebug = /--debug/.test(process.argv[2]);
+const dotenv = require('dotenv');
+dotenv.config();
 
 const token = process.env.GITHUB_TOKEN;
 const objPackage = require('./package.json');
