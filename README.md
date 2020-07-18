@@ -18,6 +18,7 @@ I've got a few features planned for the future and I am still getting my head ar
 - Sort todos
 - Warnings etc for stale todos
 - Organise todos into day created sections
+- Add categories to a todo (work, home etc)
 
 ## Thanks to
 
